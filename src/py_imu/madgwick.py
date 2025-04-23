@@ -1,9 +1,8 @@
-"""Pose and Motion Estimation with Madgwick Filter
-Urs Utzinger, 2023
-"""
+"""Pose and Motion Estimation with Madgwick Filter."""
 
 import math
 from copy import copy
+from typing import Optional
 
 import numpy as np
 
@@ -22,6 +21,7 @@ def updateIMU(
     q: Quaternion, gyr: Vector3D, acc: Vector3D, dt: float, gain: float
 ) -> Quaternion:
     """Quaternion Estimation with a Gyroscope and Accelerometer.
+
     q   : A-priori quaternion.
     gyr : Vector3D of tri-axial Gyroscope in rad/s
     acc : Vector3D of tri-axial Accelerometer in m/s^2
@@ -79,9 +79,13 @@ def updateIMU(
 
 
 def updateMARG(
-    q: Quaternion, gyr: Vector3D, acc: Vector3D, mag: Vector3D, dt: float, gain: float
+    q: Quaternion,
+    sensor_data: tuple[Vector3D, Vector3D, Vector3D],
+    dt: float,
+    gain: float,
 ) -> Quaternion:
     """Quaternion Estimation with a Gyroscope, Accelerometer and Magnetometer.
+
     q   : A-priori quaternion.
     gyr : Vector3D of tri-axial Gyroscope in rad/s
     acc : Vector3D of tri-axial Accelerometer in m/s^2
@@ -93,6 +97,8 @@ def updateMARG(
     q : Estimated quaternion.
 
     """
+    gyr, acc, mag = sensor_data
+
     acc.normalize()
     mag.normalize()
     # q.normalize() its normalized at the end
@@ -182,8 +188,9 @@ def updateMARG(
 
 
 class Madgwick:
-    """Madgwick's Gradient Descent Pose Filter
-    Earth Axis Convention: NED (North East Down)
+    """Madgwick's Gradient Descent Pose Filter.
+
+    Earth Axis Convention: NED (North, East, Down)
 
     Methods:
     - update:
@@ -197,28 +204,6 @@ class Madgwick:
       gain : float,                      Filter gain. Defaults to 0.033 for IMU implementations, or to 0.041 for MARG implementations.
       gain_imu : float, default: 0.033;  Filter gain for IMU implementation.
       gain_marg : float, default: 0.041; Filter gain for MARG implementation.
-
-    Example:
-    >>> from src.py_imu import Madgwick
-    >>> madgwick = Madgwick(frequency=150.0, gain=0.033)
-    >>> madgwick = Madgwick(dt=1/150.0, gain_imu=0.033)
-    >>> type(madgwick.q)
-
-    >>> madgwick.update(gyr=gyro_data, acc=acc_data, dt=0.01)
-    >>> madgwick.update(gyr=gyro_data, acc=acc_data, mag=mag_data, dt=0.01)
-
-    Disclaimer:
-    This code is based on https://github.com/Mayitzin/ahrs/
-    The original paper and formula references for the Madgwick algorithm are
-    - https://x-io.co.uk/downloads/madgwick_internal_report.pdf
-    The peer reviewed publication for the Madgwick algorithum is
-    - https://doi.org/10.1109/ICORR.2011.5975346
-    The original C++ implementation is
-    - https://x-io.co.uk/open-source-imu-and-ahrs-algorithms/
-    There is newer work by the same author at: https://github.com/xioTechnologies/Fusion
-    including magnetic and acceleration rejection and C to Python API.
-
-    Urs Utzinger 2023
 
     """
 
@@ -235,12 +220,17 @@ class Madgwick:
         self.gain_marg = kwargs.get("gain_marg", 0.041)
 
     def update(
-        self, gyr: Vector3D, acc: Vector3D, mag: Vector3D = None, dt: float = -1
+        self,
+        gyr: Vector3D,
+        acc: Vector3D,
+        mag: Optional[Vector3D] = None,
+        dt: float = -1,
     ) -> Quaternion:
         """Estimate the pose quaternion.
-        gyr : Vector3D of tri-axial Gyroscope in rad/s
-        acc : Vector3D of tri-axial Accelerometer in m/s^2
-        mag : Vector3D of tri-axial Magnetometer in nT, optional
+
+        gyr : Vector3D of Gyroscope in rad/s
+        acc : Vector3D of Accelerometer in m/s^2
+        mag : Vector3D of Magnetometer in nT, optional
         dt  : float, default: None, Time step, in seconds, between consecutive function calls.
         """
         self.gyr = copy(gyr)
@@ -271,8 +261,7 @@ class Madgwick:
                 # self.q.normalize()
                 # print('Init with acc and mag: ', q2rpy(self.q))
             else:
-                self.q = updateMARG(
-                    self.q, self.gyr, self.acc, self.mag, dt=dt, gain=self.gain_marg
-                )
+                sensor_data = (self.gyr, self.acc, self.mag)
+                self.q = updateMARG(self.q, sensor_data, dt=dt, gain=self.gain_marg)
 
         return self.q

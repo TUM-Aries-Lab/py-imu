@@ -243,7 +243,7 @@ def accel2q(acc) -> Quaternion:
     return q
 
 
-def accelmag2rpy(acc, mag) -> Quaternion:
+def accelmag2rpy(acc, mag) -> Vector3D:
     """Estimate Pose Vector from Accelerometer and Compass.
 
     Assuming X forward, Y right, Z down
@@ -377,28 +377,6 @@ def accelmag2q(acc, mag) -> Quaternion:
     z = sy2 * cp2 * cr2 - cy2 * sp2 * sr2
 
     q = Quaternion(w=w, x=x, y=y, z=z)
-
-    # Method of using North, East, Down
-    # to create rotation matrix and then
-    # converting rotation matrix to quaternion.
-    # Not working at this time.
-    #
-    # # Calculate the auxiliary vectors
-    # # East is cross product of gravity and magnetic field
-    # east  = _acc.cross(_mag)
-    # east.normalize()
-
-    # # North is cross product of east and gravity
-    # _acc.normalize()
-    # north = east.cross(_acc)
-
-    # # Assign the rotation matrix
-    # # "Each column or row gives the direction of one of the transformed axes."
-    # r33 = np.empty((3,3))
-    # r33[:, 0] = north.v
-    # r33[:, 1] = east.v
-    # r33[:, 2] = acc.v
-    # q = r33toq(r33, check=True)
 
     return q
 

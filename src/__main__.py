@@ -1,3 +1,5 @@
+"""Test the modules in py-imu."""
+
 import numpy as np
 from loguru import logger
 
@@ -7,6 +9,7 @@ from py_imu.quaternion import Vector3D
 
 
 def main():
+    """Test the modules in py-imu."""
     madgwick = Madgwick(frequency=100.0, gain=0.033)
     estimator = Motion(
         declination=9.27, latitude=32.253460, altitude=730, magfield=47392.3

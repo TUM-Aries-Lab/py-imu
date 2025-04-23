@@ -1,17 +1,4 @@
-###########################################################
-# Motion calculation from IMU data
-# After sensor fusion, the acceleration residuals can be
-#  calculated in the world coordinate system
-# Integrating acceleration residuals gives velocity and
-# integrating velocity gives position
-# Velocity and position are sensitive to drift and usually
-#  not very accurate
-#
-# Urs Utzinger, Spring 2023
-###########################################################
-# https://www.researchgate.net/publication/258817923_FreeIMU_An_Open_Hardware_Framework_for_Orientation_and_Motion_Sensing
-# https://web.archive.org/web/20210308200933/https://launchpad.net/freeimu/
-###########################################################
+"""Motion calculation from IMU data."""
 
 import math
 import time
@@ -20,12 +7,12 @@ from copy import copy
 from py_imu.quaternion import TWOPI, Quaternion, Vector3D
 from py_imu.utilities import RunningAverage, gravity, sensorAcc
 
-MINMOTIONTIME = 0.5  # seconds, need to have had at least half of second motion to update velocity bias
+MIN_MOTION_TIME = 0.5  # seconds, need to have had at least half of second motion to update velocity bias
 HEADING_AVG_HISTORY = 5
 
 
 class Motion:
-    """IMU Motion Estimation"""
+    """IMU Motion Estimation."""
 
     def __init__(self, **kwargs):
         # Default values are for Tucson, Arizona, USA
@@ -44,7 +31,7 @@ class Motion:
 
         self.worldVelocity = Vector3D(0, 0, 0)
         self.worldVelocity_drift = Vector3D(0, 0, 0)  # in world corrdinate system
-        self.worldVelocity_previous = Vector3D(0, 0, 0)
+        self.world_velocity_previous = Vector3D(0, 0, 0)
 
         self.worldPosition = Vector3D(0, 0, 0)
         self.worldPosition_previous = Vector3D(0, 0, 0)
@@ -60,7 +47,7 @@ class Motion:
         self.motionStart_time = time.perf_counter()
 
         self.timestamp_previous = -1.0
-        self.dtmotion = (
+        self.dt_motion = (
             0.0  # no motion has occurred yet, length of motion period in seconds
         )
         self.dt = 0.0
@@ -70,27 +57,31 @@ class Motion:
         )  # Gravity on Earth's (ellipsoid) Surface
 
     def reset(self):
+        """Reset Motion Estimation."""
         self.residuals_bias = Vector3D(0, 0, 0)
         self.worldVelocity = Vector3D(0, 0, 0)
         self.worldPosition = Vector3D(0, 0, 0)
-        self.worldVelocity_previous = Vector3D(0, 0, 0)
+        self.world_velocity_previous = Vector3D(0, 0, 0)
         self.worldVelocity_drift = Vector3D(0, 0, 0)
         self.motion = False
 
     def resetPosition(self):
+        """Reset Position."""
         self.worldPosition = Vector3D(0, 0, 0)
         self.worldPosition_previous = Vector3D(0, 0, 0)
 
     def updateAverageHeading(self, heading) -> float:
+        """Update Average Heading."""
         ## this needs two component because of 0 - 360 jump at North
         self.m_heading_X.update(math.cos(heading))
-        self.m_heading_y.update(math.sin(heading))
+        self.m_heading_Y.update(math.sin(heading))
         self.m_heading = math.atan2(self.m_heading_Y.avg, self.m_heading_X.avg)
         if self.m_heading < 0:
             self.m_heading += TWOPI
         return self.m_heading
 
     def update(self, q: Quaternion, acc: Vector3D, moving: bool, timestamp: float):
+        """Update Motion Estimation."""
         # Input:
         #  Quaternion
         #  Timestamp
@@ -122,11 +113,11 @@ class Motion:
 
         # Motion Status, ongoing, no motion, ended?
         motion_ended = False
-        if self.motion_previous == False:
-            if moving == True:
+        if not self.motion_previous:
+            if moving:
                 # Motion Started
                 self.motionStart_time = copy(timestamp)
-        elif moving == False:
+        elif not moving:
             # Motion Ended
             motion_ended = True
         # Keep track of previous status
@@ -135,10 +126,10 @@ class Motion:
         # Update Velocity and Position when moving
         if moving:
             # Integrate acceleration and add to velocity (uses trapezoidal integration technique
-            self.worldVelocity = self.worldVelocity_previous + (
+            self.worldVelocity = self.world_velocity_previous + (
                 (self.worldResiduals + self.worldResiduals_previous) * 0.5 * dt
             )
-            self.dtmotion += dt
+            self.dt_motion += dt
 
             # Update Velocity
             self.worldVelocity = self.worldVelocity - (self.worldVelocity_drift * dt)
@@ -146,28 +137,28 @@ class Motion:
             # Integrate velocity and add to position
             self.worldPosition = (
                 self.worldPosition_previous
-                + (self.worldVelocity + self.worldVelocity_previous) * 0.5 * dt
+                + (self.worldVelocity + self.world_velocity_previous) * 0.5 * dt
             )
 
             # keep history of previous values
             self.worldResiduals_previous = copy(self.worldResiduals)
-            self.worldVelocity_previous = copy(self.worldVelocity)
+            self.world_velocity_previous = copy(self.worldVelocity)
             self.worldPosition_previous = copy(self.worldPosition)
 
         else:  # no Motion
             # Estimate Velocity Bias when not moving
             # When motion ends, velocity should be zero
-            if (motion_ended == True) and (self.dtmotion > MINMOTIONTIME):
+            if motion_ended and (self.dt_motion > MIN_MOTION_TIME):
                 self.worldVelocity_drift = (
                     self.worldVelocity_drift * (1.0 - self.driftLearningAlpha)
-                ) + ((self.worldVelocity / self.dtmotion) * self.driftLearningAlpha)
-                self.dtmotion = 0.0
+                ) + ((self.worldVelocity / self.dt_motion) * self.driftLearningAlpha)
+                self.dt_motion = 0.0
 
             # Reset Residuals
             self.worldResiduals_previous = Vector3D(x=0.0, y=0.0, z=0.0)
             # Reset Velocity
             self.worldVelocity = Vector3D(x=0.0, y=0.0, z=0.0)
-            self.worldVelocity_previous = Vector3D(x=0.0, y=0.0, z=0.0)
+            self.world_velocity_previous = Vector3D(x=0.0, y=0.0, z=0.0)
 
             # Update acceleration bias, when not moving residuals should be zero
             # If accelerometer is not calibrated properly, subtracting bias will cause drift

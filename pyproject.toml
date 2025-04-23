@@ -61,6 +61,7 @@ lint.ignore = [
     "S605",  # Starting a process with a shell
     "S603",  # `subprocess` call: check for execution of untrusted input
     "N802",  # Function name should be lowercase
+    "D105",  # Missing docstring in magic method
 ]
 
 # Automatically fix issues where possible
