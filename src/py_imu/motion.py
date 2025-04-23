@@ -1,10 +1,11 @@
 """Motion calculation from IMU data."""
 
-import math
 import time
 from copy import copy
 
-from py_imu.quaternion import TWOPI, Quaternion, Vector3D
+import numpy as np
+
+from py_imu.quaternion import Quaternion, Vector3D
 from py_imu.utilities import RunningAverage, gravity, sensorAcc
 
 MIN_MOTION_TIME = 0.5  # seconds, need to have had at least half of second motion to update velocity bias
@@ -36,13 +37,13 @@ class Motion:
         self.worldPosition = Vector3D(0, 0, 0)
         self.worldPosition_previous = Vector3D(0, 0, 0)
 
-        self.driftLearningAlpha = 0.01  # Poorman's low pass filter
+        self.driftLearningAlpha = 0.01  # Poorman's low-pass filter
 
         self.heading_X_avg = 0.0
         self.heading_Y_avg = 0.0
         self.m_heading = 0.0  # average heading in radians
 
-        self.motion = False  # is device moving?
+        self.motion = False  # is the device moving?
         self.motion_previous = False
         self.motionStart_time = time.perf_counter()
 
@@ -73,11 +74,11 @@ class Motion:
     def updateAverageHeading(self, heading) -> float:
         """Update Average Heading."""
         ## this needs two component because of 0 - 360 jump at North
-        self.m_heading_X.update(math.cos(heading))
-        self.m_heading_Y.update(math.sin(heading))
-        self.m_heading = math.atan2(self.m_heading_Y.avg, self.m_heading_X.avg)
+        self.m_heading_X.update(np.cos(heading))
+        self.m_heading_Y.update(np.sin(heading))
+        self.m_heading = np.atan2(self.m_heading_Y.avg, self.m_heading_X.avg)
         if self.m_heading < 0:
-            self.m_heading += TWOPI
+            self.m_heading += 2 * np.pi
         return self.m_heading
 
     def update(self, q: Quaternion, acc: Vector3D, moving: bool, timestamp: float):
@@ -140,7 +141,7 @@ class Motion:
                 + (self.worldVelocity + self.world_velocity_previous) * 0.5 * dt
             )
 
-            # keep history of previous values
+            # keep a history of previous values
             self.worldResiduals_previous = copy(self.worldResiduals)
             self.world_velocity_previous = copy(self.worldVelocity)
             self.worldPosition_previous = copy(self.worldPosition)
@@ -161,7 +162,7 @@ class Motion:
             self.world_velocity_previous = Vector3D(x=0.0, y=0.0, z=0.0)
 
             # Update acceleration bias, when not moving residuals should be zero
-            # If accelerometer is not calibrated properly, subtracting bias will cause drift
+            # If the accelerometer is not calibrated properly, subtracting bias will cause drift
             self.residuals_bias = (
                 self.residuals_bias * (1.0 - self.driftLearningAlpha)
             ) + (self.residuals * self.driftLearningAlpha)

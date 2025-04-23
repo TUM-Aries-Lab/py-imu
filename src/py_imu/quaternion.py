@@ -5,11 +5,7 @@ import numbers
 
 import numpy as np
 
-TWOPI = 2.0 * math.pi
-PIHALF = math.pi / 2.0
-DEG2RAD = math.pi / 180.0
-RAD2DEG = 180.0 / math.pi
-EPSILON = 2.0 * math.ldexp(1.0, -53)
+from py_imu.definitions import EPSILON
 
 
 class Quaternion:
@@ -40,21 +36,6 @@ class Quaternion:
                 self.x = x
                 self.y = y
                 self.z = z
-
-    def __copy__(self):
-        return Quaternion(self.w, self.x, self.y, self.z)
-
-    def __bool__(self):
-        return not self.isZero
-
-    def __abs__(self):
-        return Quaternion(abs(self.w), abs(self.x), abs(self.y), abs(self.z))
-
-    def __neg__(self):
-        return Quaternion(-self.w, -self.x, -self.y, -self.z)
-
-    def __len__(self):
-        return 4
 
     def __str__(self):
         return f"Quaternion({self.w}, {self.x}, {self.y}, {self.z})"

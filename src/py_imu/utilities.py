@@ -8,12 +8,7 @@ from copy import copy
 
 import numpy as np
 
-from py_imu.quaternion import (
-    DEG2RAD,
-    TWOPI,
-    Quaternion,
-    Vector3D,
-)
+from py_imu.quaternion import Quaternion, Vector3D
 
 IDENTITY_QUATERNION = Quaternion(1.0, 0.0, 0.0, 0.0)
 VECTOR_ZERO = Vector3D(0.0, 0.0, 0.0)
@@ -412,7 +407,7 @@ def rpymag2h(rpy: Vector3D, mag, declination=0.0) -> float:
 
     heading = math.atan2(-tilted_mag_y, tilted_mag_x) + declination
 
-    return heading if heading > 0.0 else TWOPI + heading
+    return heading if heading > 0.0 else 2 * np.pi + heading
 
 
 def qmag2h(q: Quaternion, mag, declination=0.0) -> float:
@@ -462,7 +457,7 @@ def qmag2h(q: Quaternion, mag, declination=0.0) -> float:
 
     heading = math.atan2(-tilted_mag_y, tilted_mag_x) + declination
 
-    return heading if heading > 0.0 else TWOPI + heading
+    return heading if heading > 0.0 else 2 * np.pi + heading
 
 
 def q2gravity(pose: Quaternion) -> Vector3D:
@@ -517,7 +512,7 @@ def gravity(latitude: float, altitude: float) -> float:
     ge = 9.78032533590406  # EARTH_EQUATOR_GRAVITY
     gp = 9.832184937863065  # EARTH_POLE_GRAVITY
     e2 = 0.0066943799901413165  # EARTH_ECCENTRICITY_SQUARED
-    lat = latitude * DEG2RAD  # LATITUDE in radians
+    lat = np.deg2rad(latitude)  # LATITUDE in radians
     k = (b * gp) / (a * ge) - 1
     sin2 = math.sin(lat) ** 2
     gravity = (
