@@ -24,7 +24,9 @@ def main():
         madgwick.update(gyr=gyr, acc=acc, dt=0.01)
 
         estimator.update(q=madgwick.q, acc=acc, timestamp=0.01, moving=True)
-        logger.info(estimator)
+        logger.info(
+            f"Pos: {estimator.worldPosition} m, Vel: {estimator.worldVelocity} m/s"
+        )
 
 
 if __name__ == "__main__":
