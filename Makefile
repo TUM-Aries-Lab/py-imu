@@ -23,3 +23,7 @@ clean:
 	rm -rf juninit-pytest.xml
 	find . -name ".coverage*" -delete
 	find . -name --pycache__ -exec rm -r {} +
+
+docker:
+	docker build --no-cache -f Dockerfile -t py_imu-smoke .
+	docker run --rm py_imu-smoke

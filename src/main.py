@@ -1,15 +1,40 @@
 """Test the modules in py-imu."""
 
+import argparse
+
 import numpy as np
 from loguru import logger
 
+from py_imu.definitions import DEFAULT_LOG_LEVEL, LogLevel
 from py_imu.madgwick import Madgwick
 from py_imu.motion import Motion
 from py_imu.quaternion import Vector3D
+from py_imu.utils import setup_logger
 
 
 def main():
     """Test the modules in py-imu."""
+    parser = argparse.ArgumentParser("Run the pipeline.")
+    parser.add_argument(
+        "--log-level",
+        default=DEFAULT_LOG_LEVEL,
+        choices=list(LogLevel()),
+        help="Set the log level.",
+        required=False,
+        type=str,
+    )
+    parser.add_argument(
+        "--stderr-level",
+        default=DEFAULT_LOG_LEVEL,
+        choices=list(LogLevel()),
+        help="Set the std err level.",
+        required=False,
+        type=str,
+    )
+    args = parser.parse_args()
+
+    setup_logger(log_level=args.log_level, stderr_level=args.stderr_level)
+
     madgwick = Madgwick(frequency=100.0, gain=0.033)
     estimator = Motion(
         declination=9.27, latitude=32.253460, altitude=730, magfield=47392.3

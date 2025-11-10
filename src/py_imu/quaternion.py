@@ -4,6 +4,7 @@ import math
 import numbers
 
 import numpy as np
+from numpy.typing import NDArray
 
 from py_imu.definitions import EPSILON
 
@@ -175,13 +176,13 @@ class Quaternion:
             self.z = self.z / mag
 
     @property
-    def v(self) -> np.ndarray:
+    def v(self) -> NDArray:
         """Extract the vector component of the quaternion."""
         # return np.array([self.x,self.y,self.z])
         return Vector3D(self.x, self.y, self.z)
 
     @property
-    def q(self) -> np.ndarray:
+    def q(self) -> NDArray:
         """Convert the quaternion to np.array."""
         # return np.array([self.x,self.y,self.z])
         return np.array([self.w, self.x, self.y, self.z])
@@ -204,7 +205,7 @@ class Quaternion:
         return self.conjugate / self.norm
 
     @property
-    def r33(self) -> np.ndarray:
+    def r33(self) -> NDArray:
         """Quaternion to 3x3 rotation matrix."""
         # Normalize quaternion
         # self.normalize()
@@ -455,7 +456,7 @@ class Vector3D:
         return Quaternion(w=0, x=self.x, y=self.y, z=self.z)
 
     @property
-    def v(self) -> np.ndarray:
+    def v(self) -> NDArray:
         """Returns np array of vector."""
         return np.array([self.x, self.y, self.z])
 
