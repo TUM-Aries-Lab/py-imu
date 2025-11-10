@@ -1,10 +1,10 @@
 [tool.poetry]
 name = "py-imu"
-version = "0.0.1"
+version = "0.0.2"
 description = "Madgwick filter for IMU data and quaternions."
-authors = ["Tsmorz <tonysmoragiewicz@gmail.com>"]
+authors = ["Tsmorz <tony.smoragiewicz@tum.de>"]
 readme = "README.md"
-package-mode = false
+package-mode = true
 
 [tool.poetry.dependencies]
 python = "^3.11, <3.13"

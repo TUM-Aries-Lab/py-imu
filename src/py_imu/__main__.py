@@ -17,6 +17,7 @@ def main():
     parser = argparse.ArgumentParser("Run the pipeline.")
     parser.add_argument(
         "--log-level",
+        "-l",
         default=DEFAULT_LOG_LEVEL,
         choices=list(LogLevel()),
         help="Set the log level.",
@@ -25,6 +26,7 @@ def main():
     )
     parser.add_argument(
         "--stderr-level",
+        "-s",
         default=DEFAULT_LOG_LEVEL,
         choices=list(LogLevel()),
         help="Set the std err level.",

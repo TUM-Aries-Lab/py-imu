@@ -27,3 +27,6 @@ clean:
 docker:
 	docker build --no-cache -f Dockerfile -t py_imu-smoke .
 	docker run --rm py_imu-smoke
+
+app:
+	poetry run python -m py_imu
