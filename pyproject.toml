@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "py-imu"
-version = "0.0.2"
+version = "0.1.0"
 description = "Madgwick filter for IMU data and quaternions."
 authors = ["Tsmorz <tony.smoragiewicz@tum.de>"]
 readme = "README.md"
