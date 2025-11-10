@@ -1,4 +1,7 @@
 # Python Sensor Fusion
+[![Coverage Status](https://coveralls.io/repos/github/TUM-Aries-Lab/py-imu/badge.svg?branch=main)](https://coveralls.io/github/TUM-Aries-Lab/py-imu?branch=main)
+![Docker Image CI](https://github.com/TUM-Aries-Lab/py-imu/actions/workflows/ci.yml/badge.svg)
+
 Fuse IMU data into a Quaternion pose.
 
 ## Install

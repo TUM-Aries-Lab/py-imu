@@ -1,20 +1,24 @@
 [tool.poetry]
 name = "py-imu"
-version = "0.0.1"
+version = "0.1.0"
 description = "Madgwick filter for IMU data and quaternions."
-authors = ["Tsmorz <tonysmoragiewicz@gmail.com>"]
+authors = ["Tsmorz <tony.smoragiewicz@tum.de>"]
 readme = "README.md"
 package-mode = true
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.11, <3.13"
 numpy = "^2.2.3"
-pytest = "^8.3.5"
 loguru = "^0.7.3"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.6.9"
+mypy = "^1.11"
+pytest = "^8.3"
+pytest-cov = "^6.0"
 pre-commit = "^4.1.0"
-matplotlib = "^3.10.1"
-pytest-cov = "^6.1.0"
-scipy = "^1.15.2"
+poetry-core = "^2.1.2"
+coveralls = "^4.0.1"
 
 [build-system]
 requires = ["poetry-core"]
@@ -74,7 +78,7 @@ combine-as-imports = true
 
 # Enforce docstring styles
 [tool.lint.pydocstyle]
-convention = "google"  # Options: "google", "numpy", "pep257"
+convention = "google"
 
 # Autoformatting options
 [tool.ruff.format]
@@ -83,4 +87,4 @@ indent-style = "space"  # Use spaces instead of tabs
 line-ending = "lf"      # Use LF for line endings (Unix standard)
 
 [tool.poetry.urls]
-homepage = "https://github.com/Tsmorz/quaternion-ekf"
+homepage = "https://github.com/TUM-Aries-Lab/py-imu"

@@ -5,9 +5,10 @@ from copy import copy
 from typing import Optional
 
 import numpy as np
+from loguru import logger
 
-from py_imu.quaternion import Quaternion, Vector3D
-from py_imu.utilities import accel2q, accelmag2q
+from py_imu.fusion.quaternion import Quaternion, Vector3D
+from py_imu.fusion.utilities import accel2q, accelmag2q
 
 TWOPI = 2.0 * math.pi
 IDENTITY_QUATERNION = Quaternion(1.0, 0.0, 0.0, 0.0)
@@ -32,6 +33,7 @@ def updateIMU(
     q   : Estimated quaternion.
 
     """
+    logger.debug("Updating IMU...")
     acc.normalize()  #          // 160-162
     # q.normalize() its normalized at the end
 
@@ -208,6 +210,7 @@ class Madgwick:
     """
 
     def __init__(self, **kwargs):
+        logger.debug("Initializing Madgwick...")
         self.q = None
         self.acc = None
         self.gyr = None

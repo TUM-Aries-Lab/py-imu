@@ -8,7 +8,7 @@ from copy import copy
 
 import numpy as np
 
-from py_imu.quaternion import Quaternion, Vector3D
+from py_imu.fusion.quaternion import Quaternion, Vector3D
 
 IDENTITY_QUATERNION = Quaternion(1.0, 0.0, 0.0, 0.0)
 VECTOR_ZERO = Vector3D(0.0, 0.0, 0.0)
