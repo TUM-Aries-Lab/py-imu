@@ -12,30 +12,11 @@ from py_imu.quaternion import Vector3D
 from py_imu.utils import setup_logger
 
 
-def main():
+def main(
+    log_level: str = DEFAULT_LOG_LEVEL, stderr_level: str = DEFAULT_LOG_LEVEL
+) -> None:
     """Test the modules in py-imu."""
-    parser = argparse.ArgumentParser("Run the pipeline.")
-    parser.add_argument(
-        "--log-level",
-        "-l",
-        default=DEFAULT_LOG_LEVEL,
-        choices=list(LogLevel()),
-        help="Set the log level.",
-        required=False,
-        type=str,
-    )
-    parser.add_argument(
-        "--stderr-level",
-        "-s",
-        default=DEFAULT_LOG_LEVEL,
-        choices=list(LogLevel()),
-        help="Set the std err level.",
-        required=False,
-        type=str,
-    )
-    args = parser.parse_args()
-
-    setup_logger(log_level=args.log_level, stderr_level=args.stderr_level)
+    setup_logger(log_level=log_level, stderr_level=stderr_level)
 
     madgwick = Madgwick(frequency=100.0, gain=0.033)
     estimator = Motion(
@@ -57,4 +38,24 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser("Run the pipeline.")
+    parser.add_argument(
+        "--log-level",
+        "-l",
+        default=DEFAULT_LOG_LEVEL,
+        choices=list(LogLevel()),
+        help="Set the log level.",
+        required=False,
+        type=str,
+    )
+    parser.add_argument(
+        "--stderr-level",
+        "-s",
+        default=DEFAULT_LOG_LEVEL,
+        choices=list(LogLevel()),
+        help="Set the std err level.",
+        required=False,
+        type=str,
+    )
+    args = parser.parse_args()
+    main(log_level=args.log_level, stderr_level=args.stderr_level)
