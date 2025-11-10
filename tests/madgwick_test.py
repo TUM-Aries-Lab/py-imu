@@ -4,8 +4,8 @@ import numpy as np
 import pytest
 from loguru import logger
 
-from py_imu.madgwick import Madgwick
-from py_imu.quaternion import Vector3D
+from py_imu.fusion.madgwick import Madgwick
+from py_imu.fusion.quaternion import Vector3D
 
 
 @pytest.mark.parametrize("gain", [0.033, 0.041])

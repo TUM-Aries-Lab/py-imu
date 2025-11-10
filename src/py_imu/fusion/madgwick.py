@@ -7,8 +7,8 @@ from typing import Optional
 import numpy as np
 from loguru import logger
 
-from py_imu.quaternion import Quaternion, Vector3D
-from py_imu.utilities import accel2q, accelmag2q
+from py_imu.fusion.quaternion import Quaternion, Vector3D
+from py_imu.fusion.utilities import accel2q, accelmag2q
 
 TWOPI = 2.0 * math.pi
 IDENTITY_QUATERNION = Quaternion(1.0, 0.0, 0.0, 0.0)

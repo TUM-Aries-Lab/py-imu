@@ -5,8 +5,8 @@ from copy import copy
 
 import numpy as np
 
-from py_imu.quaternion import Quaternion, Vector3D
-from py_imu.utilities import RunningAverage, gravity, sensorAcc
+from py_imu.fusion.quaternion import Quaternion, Vector3D
+from py_imu.fusion.utilities import RunningAverage, gravity, sensorAcc
 
 MIN_MOTION_TIME = 0.5  # seconds, need to have had at least half of second motion to update velocity bias
 HEADING_AVG_HISTORY = 5

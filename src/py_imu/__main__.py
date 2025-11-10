@@ -6,9 +6,9 @@ import numpy as np
 from loguru import logger
 
 from py_imu.definitions import DEFAULT_LOG_LEVEL, LogLevel
-from py_imu.madgwick import Madgwick
-from py_imu.motion import Motion
-from py_imu.quaternion import Vector3D
+from py_imu.fusion.madgwick import Madgwick
+from py_imu.fusion.motion import Motion
+from py_imu.fusion.quaternion import Vector3D
 from py_imu.utils import setup_logger
 
 
